@@ -1,42 +1,30 @@
 import plotly.graph_objects as go
+
 import pandas as pd
+import io
+import requests
 
-df = pd.read_csv('https://github.com/globaldothealth/monkeypox/blob/main/latest.csv')
-# df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/2014_us_cities.csv')
-df.head()
+my_url = 'https://raw.githubusercontent.com/globaldothealth/monkeypox/main/latest.csv'
+proxy_dict = {
+    'https': 'http://127.0.0.1:10809'
+}
+s = requests.get(my_url, proxies=proxy_dict).text
+csv = pd.read_csv(io.StringIO(s))
+counted = csv.groupby(['Country']).size()
+counted.to_csv("./counted.csv")
+df = pd.read_csv('./counted.csv')
 
-df['text'] = df['name'] + '<br>Population ' + (df['pop'] / 1e6).astype(str) + ' million'
-limits = [(0, 2), (3, 10), (11, 20), (21, 50), (50, 3000)]
-colors = ["royalblue", "crimson", "lightseagreen", "orange", "lightgrey"]
-cities = []
-scale = 5000
+df = px.data.gapminder()
+fig = px.choropleth(df, locations="iso_alpha", color="lifeExp", hover_name="country", animation_frame="year", range_color=[20,80])
+fig.show()
 
-fig = go.Figure()
+import plotly.express as px
 
-for i in range(len(limits)):
-    lim = limits[i]
-    df_sub = df[lim[0]:lim[1]]
-    fig.add_trace(go.Scattergeo(
-        locationmode='USA-states',
-        lon=df_sub['lon'],
-        lat=df_sub['lat'],
-        text=df_sub['text'],
-        marker=dict(
-            size=df_sub['pop'] / scale,
-            color=colors[i],
-            line_color='rgb(40,40,40)',
-            line_width=0.5,
-            sizemode='area'
-        ),
-        name='{0} - {1}'.format(lim[0], lim[1])))
-
-fig.update_layout(
-    title_text='2014 US city populations<br>(Click legend to toggle traces)',
-    showlegend=True,
-    geo=dict(
-        scope='usa',
-        landcolor='rgb(217, 217, 217)',
-    )
-)
-
+fig = px.choropleth(df, geojson=counties, locations='', color='unemp',
+                           color_continuous_scale="Viridis",
+                           range_color=(0, 12),
+                           scope="usa",
+                           labels={'unemp':'unemployment rate'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 fig.show()
