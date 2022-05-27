@@ -12,6 +12,7 @@ import requests
 # csv = pd.read_csv(io.StringIO(s))
 # counted = csv.groupby(['Country']).size()
 # counted.to_csv("./counted.csv")
+
 df_counted = pd.read_csv('./counted.csv')
 df = px.data.gapminder().query("year==2007")
 df_merged = pd.merge(df, df_counted, on='country')
@@ -20,5 +21,15 @@ fig = px.choropleth(df_merged,
                     color="num",
                     hover_name="country",
                     hover_data=['num'])
-fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-fig.show()
+# fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
+app = dash.Dash()
+app.layout = html.Div([
+    dcc.Graph(figure=fig)
+])
+
+app.run_server(debug=True, use_reloader=False)  # Turn off reloader if inside Jupyter
