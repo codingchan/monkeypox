@@ -1,5 +1,5 @@
 import plotly.graph_objects as go
-
+import plotly.express as px
 import pandas as pd
 import io
 import requests
@@ -31,14 +31,13 @@ fig = px.choropleth(df_merged,
                     hover_name="country")
 fig.show()
 
-# fig = px.choropleth(df, locations='', color='unemp',
-#                            color_continuous_scale="Viridis",
-#                            range_color=(0, 12),
-#                            scope="usa",
-#                            labels={'unemp':'unemployment rate'}
-#                           )
-# fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-# fig.show()
-
-
-fig.show()
+# import dash
+# from dash import dcc
+# from dash import html
+#
+# app = dash.Dash()
+# app.layout = html.Div([
+#     dcc.Graph(figure=fig)
+# ])
+#
+# app.run_server(debug=True, use_reloader=False)  # Turn off reloader if inside Jupyter
